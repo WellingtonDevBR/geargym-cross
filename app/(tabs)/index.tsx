@@ -18,7 +18,7 @@ export default function HomeScreen() {
           <Link style={styles.profileImage} href="/drawer" asChild>
             <Pressable>
               <Image
-                source={require('./../../../assets/images/ic_user_profile.png')} 
+                source={require('./../../assets/images/ic_user_profile.png')} 
               />
             </Pressable>
           </Link>
@@ -30,28 +30,28 @@ export default function HomeScreen() {
             <View style={styles.card}>
               <Image
                 style={styles.cardImage}
-                source={require('./../../../assets/images/ic_workout.png')} 
+                source={require('./../../assets/images/ic_workout.png')} 
               />
               <Text style={styles.cardLabel}>Workout</Text>
             </View>
             <View style={styles.card}>
               <Image
                 style={styles.cardImage}
-                source={require('./../../../assets/images/ic_calculator.png')}
+                source={require('./../../assets/images/ic_calculator.png')}
               />
               <Text style={styles.cardLabel}>Fitness Calculator</Text>
             </View>
             <View style={styles.card}>
               <Image
                 style={styles.cardImage}
-                source={require('./../../../assets/images/ic_professionals.png')} 
+                source={require('./../../assets/images/ic_professionals.png')} 
               />
               <Text style={styles.cardLabel}>Find Professionals</Text>
             </View>
             <View style={styles.card}>
               <Image
                 style={styles.cardImage}
-                source={require('./../../../assets/images/ic_hub.png')} />
+                source={require('./../../assets/images/ic_hub.png')} />
               <Text style={styles.cardLabel}>Member Hub</Text>
             </View>
           </View>

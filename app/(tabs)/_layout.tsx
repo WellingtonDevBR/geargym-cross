@@ -28,7 +28,7 @@ export default function TabLayout() {
         }}
       >
         <Tabs.Screen
-          name="(home)"
+          name="index"
           options={{
             title: 'Home',
             tabBarIcon: ({ color, focused, size }) => (
@@ -37,11 +37,17 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="scannow"
+          name="void"
           options={{
-            tabBarLabel: '',
+            tabBarLabel: 'Scan Now',
             tabBarIcon: () => null,
           }}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault();
+              navigation.navigate('scannow');
+            },
+          })}
         />
         <Tabs.Screen
           name="support"
@@ -77,7 +83,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#6200ee',
+    backgroundColor: '#9747FF',
     justifyContent: 'center',
     alignItems: 'center',
   },
