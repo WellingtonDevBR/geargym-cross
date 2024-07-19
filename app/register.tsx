@@ -1,42 +1,95 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+// app/screens/SignUpScreen.tsx
+
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import { register } from './api/auth'; // Import the register function
+import { validateForm } from './utils/validation'; 
+import styles from './styles/register';
 
 const { width, height } = Dimensions.get('window');
 
 export default function SignUpScreen() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [repeatPassword, setRepeatPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
+
   const navigation = useNavigation();
+
+  useEffect(() => {
+    setIsFormValid(validateForm(name, email, password, repeatPassword, isChecked));
+  }, [name, email, password, repeatPassword, isChecked]);
+
+  const handleSignUp = async () => {
+    if (!isFormValid) {
+      Alert.alert('Validation Error', 'Please fill in all fields correctly.');
+      return;
+    }
+
+    try {
+      const userData = await register(name, email, password);
+      Alert.alert('Success', 'User registered successfully');
+      navigation.navigate('login'); // Navigate to login screen or any other screen after successful registration
+    } catch (error) {
+      Alert.alert('Registration Error', 'Failed to register user');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Image source={require('./../assets/images/ic_up_button.png')} style={styles.backIcon} />
+          <Image source={require('../assets/images/ic_up_button.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Image style={styles.logo} source={require('./../assets/images/logo.png')} />
+        <Image style={styles.logo} source={require('../assets/images/logo.png')} />
         <Text style={styles.signUpText}>SIGN UP NOW</Text>
         <Text style={styles.subText}>Please sign up to continue to GearGym!</Text>
 
         <View style={styles.inputContainer}>
-          <Image source={require('./../assets/images/ic_user.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Enter user name" />
+          <Image source={require('../assets/images/ic_user.png')} style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter name"
+            value={name}
+            onChangeText={setName}
+          />
         </View>
 
         <View style={styles.inputContainer}>
-          <Image source={require('./../assets/images/ic_email.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Enter email" keyboardType="email-address" />
+          <Image source={require('../assets/images/ic_email.png')} style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter email"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
         </View>
 
         <View style={styles.inputContainer}>
-          <Image source={require('./../assets/images/ic_password.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Enter password" secureTextEntry={true} />
+          <Image source={require('../assets/images/ic_password.png')} style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Enter password"
+            secureTextEntry={true}
+            value={password}
+            onChangeText={setPassword}
+          />
         </View>
 
         <View style={styles.inputContainer}>
-          <Image source={require('./../assets/images/ic_password.png')} style={styles.inputIcon} />
-          <TextInput style={styles.input} placeholder="Repeat password" secureTextEntry={true} />
+          <Image source={require('../assets/images/ic_password.png')} style={styles.inputIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Repeat password"
+            secureTextEntry={true}
+            value={repeatPassword}
+            onChangeText={setRepeatPassword}
+          />
         </View>
 
         <View style={styles.checkboxContainer}>
@@ -49,108 +102,10 @@ export default function SignUpScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.signUpButton}>
+        <TouchableOpacity style={[styles.signUpButton, !isFormValid && { backgroundColor: '#cccccc' }]} disabled={!isFormValid} onPress={handleSignUp}>
           <Text style={styles.signUpButtonText}>Sign Up</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  scrollViewContent: {
-    alignItems: 'center',
-    padding: 16,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-    marginTop: 40,
-    marginLeft: 20,
-  },
-  backIcon: {
-    width: 24,
-    height: 24,
-    tintColor: '#000000',
-  },
-  logo: {
-    width: 122,
-    height: 122,
-  },
-  signUpText: {
-    fontSize: 24,
-    color: '#333333',
-    fontWeight: 'bold',
-    marginTop: 26,
-  },
-  subText: {
-    fontSize: 16,
-    color: '#80333333',
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#CCCCCC',
-    borderRadius: 8,
-    marginTop: 10,
-    width: width - 72,
-    height: 50,
-    paddingHorizontal: 10,
-  },
-  inputIcon: {
-    marginRight: 10,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333333',
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 10,
-    width: width - 72,
-  },
-  checkboxWrapper: {
-    marginRight: 10,
-  },
-  checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 1,
-    borderColor: '#434343',
-    borderRadius: 3,
-  },
-  checkedCheckbox: {
-    backgroundColor: '#9747FF',
-  },
-  checkboxText: {
-    fontSize: 14,
-    color: '#434343',
-  },
-  termsText: {
-    fontSize: 14,
-    color: '#434343',
-    fontWeight: 'bold',
-  },
-  signUpButton: {
-    backgroundColor: '#9747FF',
-    borderRadius: 8,
-    width: width - 72,
-    height: 52,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  signUpButtonText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-});
