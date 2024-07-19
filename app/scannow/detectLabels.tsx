@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView, ScrollView, Dimensions } from 'react-native';
 import { CameraView, CameraCapturedPicture, CameraPictureOptions, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useNavigation } from '@react-navigation/native';
-import { detectCustomLabels } from './../api/detectCustomLabels';
+import { detectLabels } from '../api/detectLabels';
 
 export default function ScanNowScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -34,7 +34,7 @@ export default function ScanNowScreen() {
             console.error('Error taking picture:', error);
           }
         }
-      }, 10000);
+      }, 20000);
     }
     return () => clearInterval(interval);
   }, [isCameraReady]);
@@ -42,7 +42,7 @@ export default function ScanNowScreen() {
   const processImage = async (base64: string) => {
     try {
       const resizedImage: any = await resizeImage(base64);
-      const detectedLabels: any = await detectCustomLabels(resizedImage.base64);
+      const detectedLabels: any = await detectLabels(resizedImage.base64);
       const croppedImages = await cropDetectedObjects(resizedImage.base64, detectedLabels);
       updateLabels(croppedImages);
     } catch (error) {
@@ -53,23 +53,27 @@ export default function ScanNowScreen() {
   const resizeImage = async (base64: string) => {
     const resizedImage = await ImageManipulator.manipulateAsync(
       `data:image/jpeg;base64,${base64}`,
-      [{ resize: { width: 640 } }],
+      [{ resize: { width: 800 } }],
       { format: ImageManipulator.SaveFormat.JPEG, base64: true }
     );
     return resizedImage;
   };
 
-  const cropDetectedObjects = async (base64: string, customLabels: any) => {
+  const cropDetectedObjects = async (base64: string, labels: any) => {
     const croppedImages = [];
-    for (let label of customLabels) {
-      if (label.Geometry && label.Geometry.BoundingBox) {
-        const { BoundingBox } = label.Geometry;
-        const croppedImage = await cropImage(base64, BoundingBox);
-        croppedImages.push({
-          uri: croppedImage.uri,
-          name: label.Name,
-          confidence: label.Confidence,
-        });
+    for (let label of labels) {
+      if (label.Instances.length > 0) {
+        for (let instance of label.Instances) {
+          if (instance.BoundingBox) {
+            const { BoundingBox } = instance;
+            const croppedImage = await cropImage(base64, BoundingBox);
+            croppedImages.push({
+              uri: croppedImage.uri,
+              name: label.Name,
+              confidence: label.Confidence,
+            });
+          }
+        }
       }
     }
     return croppedImages;
@@ -91,12 +95,31 @@ export default function ScanNowScreen() {
   };
 
   const updateLabels = (newLabels: any) => {
-    let combinedLabels = [...labels, ...newLabels];
-    combinedLabels = combinedLabels.sort((a, b) => b.confidence - a.confidence);
-    if (combinedLabels.length > 3) {
-      combinedLabels = combinedLabels.slice(0, 3);
-    }
-    setLabels(combinedLabels);
+    const updatedLabels = [...labels];
+
+    newLabels.forEach((newLabel: any) => {
+      const existingIndex = updatedLabels.findIndex((label: any) => label.name === newLabel.name);
+
+      if (existingIndex !== -1) {
+        if (newLabel.confidence > updatedLabels[existingIndex].confidence) {
+          updatedLabels[existingIndex] = newLabel;
+        }
+      } else {
+        if (updatedLabels.length < 3) {
+          updatedLabels.push(newLabel);
+        } else {
+          const minConfidenceIndex = updatedLabels.reduce((minIndex, label, index, array) =>
+            label.confidence < array[minIndex].confidence ? index : minIndex
+          , 0);
+
+          if (newLabel.confidence > updatedLabels[minConfidenceIndex].confidence) {
+            updatedLabels[minConfidenceIndex] = newLabel;
+          }
+        }
+      }
+    });
+
+    setLabels(updatedLabels.sort((a, b) => b.confidence - a.confidence));
   };
 
   return (
@@ -185,6 +208,7 @@ const styles = StyleSheet.create({
   recognizedEquipmentContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   recognizedText: {
     color: 'white',
@@ -193,7 +217,7 @@ const styles = StyleSheet.create({
   },
   detectedItem: {
     alignItems: 'center',
-    marginRight: 10,
+    marginHorizontal: 10,
   },
   detectedImage: {
     width: 100,

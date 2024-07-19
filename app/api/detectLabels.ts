@@ -1,7 +1,11 @@
 import AWS from 'aws-sdk';
 import { Buffer } from 'buffer';
 
-AWS.config.update({ region: 'us-east-2' });
+AWS.config.update({
+    region: 'us-east-2',
+    accessKeyId: process.env.EXPO_PUBLIC_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.EXPO_PUBLIC_AWS_SECRET_ACCESS_KEY
+});
 
 const rekognition = new AWS.Rekognition();
 
@@ -10,7 +14,7 @@ export const detectLabels = async (base64: any) => {
 
   const params = {
     Image: { Bytes: buffer },
-    MaxLabels: 10,
+    MaxLabels: 1,
     MinConfidence: 70,
   };
 
