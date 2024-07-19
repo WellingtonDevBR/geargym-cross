@@ -18,7 +18,7 @@ export default function SignUpScreen() {
   const [isChecked, setIsChecked] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
     setIsFormValid(validateForm(name, email, password, repeatPassword, isChecked));

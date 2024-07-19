@@ -5,15 +5,14 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
-  Dimensions,
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { login } from './api/auth';
-import { validateEmail, validatePassword } from './utils/validation'; 
+import { getUser } from './database/userQueries'; // Adjust the path to your user queries file
+import { validateEmail, validatePassword } from './utils/validation';
 import styles from './styles/login';
 
 export default function LoginScreen() {
@@ -21,14 +20,14 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isSelected, setSelection] = useState(false);
   const [isButtonEnabled, setButtonEnabled] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   useEffect(() => {
     setButtonEnabled(validateFields());
   }, [email, password]);
 
   const validateFields = () => {
-    return validateEmail(email) == validatePassword(password); // change to && 
+    return validateEmail(email) && validatePassword(password);
   };
 
   const handleLogin = async () => {
@@ -38,12 +37,14 @@ export default function LoginScreen() {
     }
 
     try {
-      const userData = await login(email, password);
-      // Handle successful login, e.g., save token, navigate to home screen
-      navigation.navigate('(tabs)');
+      const user = await getUser(email, password);
+      if (user) {
+        navigation.navigate('(tabs)');
+      } else {
+        Alert.alert('Login Error', 'Invalid email or password');
+      }
     } catch (error) {
-      navigation.navigate('(tabs)');
-      // Alert.alert('Login Error', 'Invalid email or password');
+      Alert.alert('Login Error', 'An error occurred during login');
     }
   };
 
@@ -53,7 +54,7 @@ export default function LoginScreen() {
         <View style={styles.container}>
           <Image
             style={styles.logo}
-            source={require('./../assets/images/logo.png')} // Adjust the path to your logo image
+            source={require('./../assets/images/logo.png')}
           />
           <Text style={styles.welcomeText}>Welcome to GearGym!</Text>
           <Text style={styles.subText}>Please sign in to continue to GearGym</Text>

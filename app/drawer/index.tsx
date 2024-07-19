@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 const { width, height } = Dimensions.get('window');
 
 export default function DrawerScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
 
   return (
     <SafeAreaView style={styles.safeArea}>

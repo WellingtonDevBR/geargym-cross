@@ -21,7 +21,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/ic_launcher_foreground.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
@@ -42,6 +42,18 @@
         "expo-camera",
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Inter-Bold.ttf", 
+            "./assets/fonts/Inter-Medium.ttf", 
+            "./assets/fonts/Inter-Regular.ttf", 
+            "./assets/fonts/Poppins-Medium.ttf", 
+            "./assets/fonts/Poppins-Regular.ttf"
+          ]
         }
       ]
     ],
