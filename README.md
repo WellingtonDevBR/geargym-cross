@@ -1,50 +1,87 @@
-# Welcome to your Expo app 👋
+# GearGym App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+![GearGym Logo](./assets/images/logo.png)
 
-## Get started
+GearGym is your ultimate fitness companion app designed to enhance your gym experience. With features like camera recognition for gym equipment, workout creation, calorie calculators, and professional guidance, GearGym ensures you get the most out of your fitness routine.
 
-1. Install dependencies
+## Features
+
+### Sign-In/Out Feature
+Securely sign into your personal GearGym account to access personalized features and track your progress. Easy sign-out for when you're done.
+
+### Home Screen
+The main hub where users can navigate to different sections of the app, view important updates, and access various features.
+
+### Camera Recognition
+Use your phone's camera to recognize gym equipment and learn how to use them effectively.
+
+> **Note:** The recognition feature using AWS's `detectCustomLabels` has a high cost. For testing or usage, please contact us to enable it. Alternatively, you can use `detectLabels` instead of `detectCustomLabels` by modifying the `_layout` in the `scannow` folder. Make sure to change the `stack.screen` name from `index` to `detectLabels`.
+
+![Camera Recognition](./assets//images/camera_recognition.png)
+
+### Profile Edit (Pending)
+Update your personal information, fitness goals, and preferences to tailor your GearGym experience. (This feature is pending development.)
+
+### Find Professionals (Pending)
+Search and connect with gym professionals for personalized, paid guidance and support. (This feature is pending development.)
+
+## Requirements
+
+To create an account on GearGym, the following requirements must be met:
+
+- **Username:** Must be unique and contain between 3 and 20 characters.
+- **Email:** Must be a valid email address.
+- **Password Requirements:**
+  - Minimum of 8 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+  - At least one special character (e.g., !@#$%^&*)
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/WellingtonDevBR/geargym-cross.git
+   ```
+2. Navigate to the project directory:
+
+   ```bash
+   cd geargym-cross
+   ```
+3. Install the dependencies:
 
    ```bash
    npm install
    ```
-
-2. Start the app
+4. Navigate to the project directory:
 
    ```bash
-    npx expo start
+   npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+### Usage
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+1. Sign Up: Create an account by providing a username, valid email, and a password that meets the requirements.
+2. Log In: Access your account by logging in with your email and password.
+3. Explore Features: Use the home screen to navigate through different features of the app.
+4. Use Camera Recognition: Point your camera at gym equipment to get detailed information on how to use it.
+5. Edit Profile: Update your profile information, fitness goals, and preferences (once the feature is available).
+6. Find Professionals: Search for and connect with gym professionals for personalized guidance (once the feature is available).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Screenshots
 
-## Get a fresh project
+### Home Screen
 
-When you're ready, run:
+### Camera Recognition
 
-```bash
-npm run reset-project
-```
+### License
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+This project is licensed under the MIT License. See the LICENSE file for more information.
 
-## Learn more
+### Contact
 
-To learn more about developing your project with Expo, look at the following resources:
+If you have any questions, feel free to reach out:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+* Email: 6881@ait.nsw.edu.au
