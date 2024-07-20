@@ -4,9 +4,9 @@ import { AuthProvider } from '../utils/context/authContext';
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-      </Stack>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+        </Stack>
     </AuthProvider>
   );
 }

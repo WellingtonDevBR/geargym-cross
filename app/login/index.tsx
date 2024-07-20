@@ -11,16 +11,30 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { getUser } from './database/userQueries'; // Adjust the path to your user queries file
-import { validateEmail, validatePassword } from './utils/validation';
-import styles from './styles/login';
+import * as SecureStore from 'expo-secure-store';
+import styles from './styles';
+import { validateEmail, validatePassword } from '@/app/utils/validation';
+import { useAuth } from '../utils/context/authContext';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isSelected, setSelection] = useState(false);
   const [isButtonEnabled, setButtonEnabled] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const navigation = useNavigation<any>();
+  const { login } = useAuth();
+
+  useEffect(() => {
+    const loadRememberedEmail = async () => {
+      const rememberedEmail = await SecureStore.getItemAsync('rememberedEmail');
+      if (rememberedEmail) {
+        setEmail(rememberedEmail);
+        setRememberMe(true);
+      }
+    };
+
+    loadRememberedEmail();
+  }, []);
 
   useEffect(() => {
     setButtonEnabled(validateFields());
@@ -37,14 +51,15 @@ export default function LoginScreen() {
     }
 
     try {
-      const user = await getUser(email, password);
-      if (user) {
-        navigation.navigate('(tabs)');
+      await login(email, password);
+      if (rememberMe) {
+        await SecureStore.setItemAsync('rememberedEmail', email);
       } else {
-        Alert.alert('Login Error', 'Invalid email or password');
+        await SecureStore.deleteItemAsync('rememberedEmail');
       }
+      navigation.navigate('(tabs)');
     } catch (error) {
-      Alert.alert('Login Error', 'An error occurred during login');
+      Alert.alert('Login Error', 'Invalid email or password');
     }
   };
 
@@ -54,13 +69,13 @@ export default function LoginScreen() {
         <View style={styles.container}>
           <Image
             style={styles.logo}
-            source={require('./../assets/images/logo.png')}
+            source={require('./../../assets/images/logo.png')}
           />
           <Text style={styles.welcomeText}>Welcome to GearGym!</Text>
           <Text style={styles.subText}>Please sign in to continue to GearGym</Text>
 
           <View style={styles.inputContainer}>
-            <Image source={require('./../assets/images/ic_email.png')} style={styles.inputIcon} />
+            <Image source={require('./../../assets/images/ic_email.png')} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Enter email"
@@ -72,7 +87,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputContainer}>
-            <Image source={require('./../assets/images/ic_password.png')} style={styles.inputIcon} />
+            <Image source={require('./../../assets/images/ic_password.png')} style={styles.inputIcon} />
             <TextInput
               style={styles.input}
               placeholder="Enter password"
@@ -86,9 +101,9 @@ export default function LoginScreen() {
           <View style={styles.rememberMeContainer}>
             <TouchableOpacity
               style={styles.checkboxContainer}
-              onPress={() => setSelection(!isSelected)}
+              onPress={() => setRememberMe(!rememberMe)}
             >
-              <View style={[styles.checkbox, isSelected && styles.checkboxSelected]} />
+              <View style={[styles.checkbox, rememberMe && styles.checkboxSelected]} />
               <Text style={styles.rememberMeText}>Remember Me</Text>
             </TouchableOpacity>
             <TouchableOpacity>

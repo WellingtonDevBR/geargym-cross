@@ -5,9 +5,11 @@ import { Tabs, useNavigation } from 'expo-router';
 import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import CustomBottomTabBar from '../../components/navigation/CustomBottomTabBar'; // Update the import path as needed
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '@/components/navigation/types';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import CustomBottomTabBar from '@/components/navigation/CustomBottomTabBar';
+import { AuthProvider } from '../utils/context/authContext';
 
 const { width } = Dimensions.get('window');
 const tabBarHeight = 60;
@@ -19,56 +21,60 @@ export default function TabLayout() {
   const navigation = useNavigation<NavigationProp>();
 
   return (
-    <View style={{ flex: 1 }}>
-      <Tabs
-        tabBar={(props) => <CustomBottomTabBar {...props} />}
-        screenOptions={{
-          tabBarActiveTintColor: Colors[colorScheme].tint,
-          headerShown: false,
-        }}
-      >
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color, focused, size }) => (
-              <TabBarIcon name={focused ? 'home' : 'home-outline'} color={focused ? '#9747FF' : 'black'} size={size} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="void"
-          options={{
-            tabBarLabel: 'Scan Now',
-            tabBarIcon: () => null,
-          }}
-          listeners={({ navigation }) => ({
-            tabPress: (e) => {
-              e.preventDefault();
-              navigation.navigate('scannow');
-            },
-          })}
-        />
-        <Tabs.Screen
-          name="support"
-          options={{
-            title: 'Support',
-            tabBarIcon: ({ color, focused, size }) => (
-              <TabBarIcon name={focused ? 'information-circle' : 'information-circle-outline'} color={focused ? '#9747FF' : 'black'} size={size} />
-            ),
-          }}
-        />
-      </Tabs>
-      <View style={styles.fabContainer}>
-        <FAB
-          style={styles.fab}
-          small={false}
-          icon="camera"
-          color="white"
-          onPress={() => navigation.navigate('scannow')}
-        />
-      </View>
-    </View>
+    <AuthProvider>
+      <ProtectedRoute>
+        <View style={{ flex: 1 }}>
+          <Tabs
+            tabBar={(props) => <CustomBottomTabBar {...props} />}
+            screenOptions={{
+              tabBarActiveTintColor: Colors[colorScheme].tint,
+              headerShown: false,
+            }}
+          >
+            <Tabs.Screen
+              name="index"
+              options={{
+                title: 'Home',
+                tabBarIcon: ({ color, focused, size }) => (
+                  <TabBarIcon name={focused ? 'home' : 'home-outline'} color={focused ? '#9747FF' : 'black'} size={size} />
+                ),
+              }}
+            />
+            <Tabs.Screen
+              name="void"
+              options={{
+                tabBarLabel: 'Scan Now',
+                tabBarIcon: () => null,
+              }}
+              listeners={({ navigation }) => ({
+                tabPress: (e) => {
+                  e.preventDefault();
+                  navigation.navigate('scannow');
+                },
+              })}
+            />
+            <Tabs.Screen
+              name="support"
+              options={{
+                title: 'Support',
+                tabBarIcon: ({ color, focused, size }) => (
+                  <TabBarIcon name={focused ? 'information-circle' : 'information-circle-outline'} color={focused ? '#9747FF' : 'black'} size={size} />
+                ),
+              }}
+            />
+          </Tabs>
+          <View style={styles.fabContainer}>
+            <FAB
+              style={styles.fab}
+              small={false}
+              icon="camera"
+              color="white"
+              onPress={() => navigation.navigate('scannow')}
+            />
+          </View>
+        </View>
+      </ProtectedRoute>
+    </AuthProvider>
   );
 }
 

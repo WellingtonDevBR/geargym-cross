@@ -3,7 +3,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const cardWidth = (width - 72) / 2;
 const cardHeight = cardWidth * 1.2;
 

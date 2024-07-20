@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TextInput, TouchableOpacity, ScrollView, Dimensions, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { addUser } from './database/userQueries'; // Adjust the path to your user queries file
-import { validateForm } from './utils/validation'; 
-import styles from './styles/register';
-
-const { width, height } = Dimensions.get('window');
+import styles from './styles';
+import { validateForm } from '@/app/utils/validation';
+import { useAuth } from '../utils/context/authContext';
 
 export default function SignUpScreen() {
   const [name, setName] = useState('');
@@ -17,6 +15,7 @@ export default function SignUpScreen() {
   const [isFormValid, setIsFormValid] = useState(false);
 
   const navigation = useNavigation<any>();
+  const { register } = useAuth();
 
   useEffect(() => {
     setIsFormValid(validateForm(name, email, password, repeatPassword, isChecked));
@@ -29,15 +28,11 @@ export default function SignUpScreen() {
     }
 
     try {
-      await addUser(name, email, password);
+      await register(name, email, password);
       Alert.alert('Success', 'User registered successfully');
-      navigation.navigate('(tabs)');
-    } catch (error: any) {
-      if (error.message === 'Email already registered') {
-        Alert.alert('Registration Error', 'Email is already registered');
-      } else {
-        Alert.alert('Registration Error', 'Failed to register user');
-      }
+      navigation.navigate('login'); // Navigate to login screen or any other screen after successful registration
+    } catch (error) {
+      Alert.alert('Registration Error', 'Failed to register user');
     }
   };
 
@@ -45,14 +40,14 @@ export default function SignUpScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Image source={require('../assets/images/ic_up_button.png')} style={styles.backIcon} />
+          <Image source={require('./../../assets/images/ic_up_button.png')} style={styles.backIcon} />
         </TouchableOpacity>
-        <Image style={styles.logo} source={require('../assets/images/logo.png')} />
+        <Image style={styles.logo} source={require('./../../assets/images/logo.png')} />
         <Text style={styles.signUpText}>SIGN UP NOW</Text>
         <Text style={styles.subText}>Please sign up to continue to GearGym!</Text>
 
         <View style={styles.inputContainer}>
-          <Image source={require('../assets/images/ic_user.png')} style={styles.inputIcon} />
+          <Image source={require('./../../assets/images/ic_user.png')} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Enter name"
@@ -62,7 +57,7 @@ export default function SignUpScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image source={require('../assets/images/ic_email.png')} style={styles.inputIcon} />
+          <Image source={require('./../../assets/images/ic_email.png')} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Enter email"
@@ -73,7 +68,7 @@ export default function SignUpScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image source={require('../assets/images/ic_password.png')} style={styles.inputIcon} />
+          <Image source={require('./../../assets/images/ic_password.png')} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Enter password"
@@ -84,7 +79,7 @@ export default function SignUpScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Image source={require('../assets/images/ic_password.png')} style={styles.inputIcon} />
+          <Image source={require('./../../assets/images/ic_password.png')} style={styles.inputIcon} />
           <TextInput
             style={styles.input}
             placeholder="Repeat password"

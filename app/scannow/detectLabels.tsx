@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, SafeAreaView, ScrollVi
 import { CameraView, CameraCapturedPicture, CameraPictureOptions, useCameraPermissions } from 'expo-camera';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { useNavigation } from '@react-navigation/native';
-import { detectLabels } from '../api/detectLabels';
+import { detectLabels } from '@/app/utils/api/detectLabels';
 
 export default function ScanNowScreen() {
   const [permission, requestPermission] = useCameraPermissions();
