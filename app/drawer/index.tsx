@@ -1,18 +1,27 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import styles from './styles';
 import { useAuth } from '../utils/context/authContext';
+import { useRouter } from 'expo-router';
 
 export default function DrawerScreen() {
   const navigation = useNavigation<any>();
-  const { logout } = useAuth();
+  const { user, loading, logout } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
     logout();
     navigation.navigate('login');
   };
+
+  useEffect(() => {
+    // Redirect to login if the user is not authenticated and not loading
+    if (!loading && !user) {
+      router.replace('/login');
+    }
+  }, [user, loading]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -25,11 +34,11 @@ export default function DrawerScreen() {
           <View style={styles.profileContainer}>
             <Image
               style={styles.profileImage}
-              source={require('./../../assets/images/ic_user_profile.png')}
+              source={user?.avatar ? { uri: user.avatar } : require('./../../assets/images/avatar-placeholder.png')}
             />
             <View style={styles.profileTextContainer}>
               <Text style={styles.welcomeLabel}>Hey, 👋</Text>
-              <Text style={styles.username}>John Smith</Text>
+              <Text style={styles.username}>{user?.name}</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.closeButton} onPress={() => navigation.goBack()}>
@@ -39,7 +48,7 @@ export default function DrawerScreen() {
             />
           </TouchableOpacity>
           <View style={styles.menuItemsContainer}>
-            <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('EditProfile')}>
+            <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('editProfile')}>
               <Image style={styles.menuItemIcon} source={require('./../../assets/images/ic_profile.png')} />
               <Text style={styles.menuItemText}>Edit Profile</Text>
             </TouchableOpacity>

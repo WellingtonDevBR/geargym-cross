@@ -8,6 +8,7 @@ interface User {
   [key: string]: any;
 }
 
+// Existing getUser function
 export const getUser = async (email: string, password: string): Promise<User | null> => {
   const db = await initializeDatabase();
   const query = 'SELECT * FROM User WHERE LOWER(email) = LOWER(?) AND password = ?';
@@ -21,9 +22,10 @@ export const getUser = async (email: string, password: string): Promise<User | n
   }
 };
 
+// Existing addUser function
 export const addUser = async (name: string, email: string, password: string): Promise<void> => {
   const db = await initializeDatabase();
-  
+
   // Check if the email is already registered
   const checkQuery = 'SELECT * FROM User WHERE LOWER(email) = LOWER(?)';
   const checkParams = [email.toLowerCase()];

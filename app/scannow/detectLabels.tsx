@@ -34,7 +34,7 @@ export default function ScanNowScreen() {
             console.error('Error taking picture:', error);
           }
         }
-      }, 20000);
+      }, 10000);
     }
     return () => clearInterval(interval);
   }, [isCameraReady]);
@@ -110,7 +110,7 @@ export default function ScanNowScreen() {
         } else {
           const minConfidenceIndex = updatedLabels.reduce((minIndex, label, index, array) =>
             label.confidence < array[minIndex].confidence ? index : minIndex
-          , 0);
+            , 0);
 
           if (newLabel.confidence > updatedLabels[minConfidenceIndex].confidence) {
             updatedLabels[minConfidenceIndex] = newLabel;

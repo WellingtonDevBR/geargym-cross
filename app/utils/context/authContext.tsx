@@ -1,64 +1,72 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import * as SecureStore from 'expo-secure-store';
-import { User } from 'aws-sdk/clients/appstream';
-import { addUser, getUser } from '../database/userQueries';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { auth, db } from '@/app/firebaseConfig';
 
-interface AuthContextProps {
-  user: User | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  register: (name: string, email: string, password: string) => Promise<void>;
-}
+const AuthContext = createContext<any>(null);
 
-const AuthContext = createContext<AuthContextProps | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthProvider = ({ children }: any) => {
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadUser = async () => {
-      const userData = await SecureStore.getItemAsync('user');
-      if (userData) {
-        setUser(JSON.parse(userData));
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: any) => {
+      if (firebaseUser) {
+        const userDoc = await getUserData(firebaseUser.uid);
+        setUser({ ...firebaseUser, ...userDoc });
+      } else {
+        setUser(null);
       }
       setLoading(false);
-    };
-    loadUser();
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
-    const loggedInUser: any = await getUser(email, password);
-    if (loggedInUser) {
-      setUser(loggedInUser);
-      await SecureStore.setItemAsync('user', JSON.stringify(loggedInUser));
+  const getUserData = async (uid: string) => {
+    const userDocRef = doc(db, 'User', uid);
+    const userDoc = await getDoc(userDocRef);
+    if (userDoc.exists()) {
+      return userDoc.data();
     } else {
-      throw new Error('Invalid email or password');
+      console.error('No such document!');
+      return {};
     }
   };
 
-  const logout = async () => {
-    setUser(null);
-    await SecureStore.deleteItemAsync('user');
+  const register = async (name: string, email: string, password: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Save user data in Firestore
+    await setDoc(doc(db, 'User', user.uid), {
+      name,
+      email,
+      uid: user.uid,
+    });
+
+    const userDoc = await getUserData(user.uid);
+    setUser({ ...user, ...userDoc });
   };
 
-  const register = async (name: string, email: string, password: string) => {
-    await addUser(name, email, password);
-    await login(email, password);
+  const login = async (email: string, password: string) => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const userDoc = await getUserData(user.uid);
+    setUser({ ...user, ...userDoc });
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, register }}>
+    <AuthContext.Provider value={{ user, loading, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export const useAuth = () => useContext(AuthContext);
